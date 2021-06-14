@@ -7,5 +7,6 @@ data class WeatherResponse(
     @SerializedName("lon") val lon: Float,
     @SerializedName("timezone") val timezone: String,
     @SerializedName("timezone_offset") val timezoneOffset: Int,
-    @SerializedName("current") val currentDayWeather: WeatherData
+    @SerializedName("current") val currentDayWeather: WeatherData,
+    @SerializedName("daily") val dailyWeatherData: List<DailyWeatherData>
 )
