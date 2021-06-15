@@ -2,9 +2,7 @@ package com.abhat.simpleweather.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.abhat.simpleweather.data.model.WeatherData
-import com.abhat.simpleweather.data.model.WeatherMeta
-import com.abhat.simpleweather.data.model.WeatherResponse
+import com.abhat.simpleweather.data.model.*
 import com.abhat.simpleweather.data.repository.WeatherRepoState
 import com.abhat.simpleweather.data.repository.WeatherRepository
 import com.abhat.simpleweather.ui.CoroutineContextProvider
@@ -42,7 +40,89 @@ class WeatherViewModelTest {
                 humidity = 0,
                 windSpeed = 0F,
                 description = "",
-                dailyWeatherData = listOf()
+                min = 19f,
+                max = 22f,
+                dailyWeatherData = listOf(DailyWeatherData(
+                    temp = Temp(
+                        day = 0f,
+                        min = 19f,
+                        max = 22f,
+                        night = 0f,
+                        evening = 0f,
+                        morning = 0f
+                    ),
+                    date = 0L,
+                    sunsetTime = 0L,
+                    sunriseTime = 0L,
+                    moonRiseTime = 0L,
+                    moonSetTime = 0L,
+                    moonPhase = 0F,
+                    feelsLike = FeelsLike(0f, 0f, 0f, 0f),
+                    pressure = 0,
+                    humidity = 0,
+                    dewPoint = 0F,
+                    uvi = 0F,
+                    clouds = 0,
+                    windSpeed = 0F,
+                    windDegree = 0,
+                    weatherMeta = listOf()
+                ))
+            )
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherRepoState.Success(weatherResponse = getWeatherResponse())
+                    ))
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val inOrder = inOrder(weatherObserver)
+            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+            inOrder.verify(weatherObserver).onChanged(expectedState)
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper state with min and max for success response`() {
+        runBlocking {
+            // Given
+            val expectedState = WeatherViewModel.ViewState.Weather(
+                temp = 21.1F,
+                feelsLike = 20.1F,
+                humidity = 0,
+                windSpeed = 0F,
+                description = "",
+                min = 19F,
+                max = 22F,
+                dailyWeatherData = listOf(DailyWeatherData(
+                    temp = Temp(
+                        day = 0f,
+                        min = 19f,
+                        max = 22f,
+                        night = 0f,
+                        evening = 0f,
+                        morning = 0f
+                    ),
+                    date = 0L,
+                    sunsetTime = 0L,
+                    sunriseTime = 0L,
+                    moonRiseTime = 0L,
+                    moonSetTime = 0L,
+                    moonPhase = 0F,
+                    feelsLike = FeelsLike(0f, 0f, 0f, 0f),
+                    pressure = 0,
+                    humidity = 0,
+                    dewPoint = 0F,
+                    uvi = 0F,
+                    clouds = 0,
+                    windSpeed = 0F,
+                    windDegree = 0,
+                    weatherMeta = listOf()
+                ))
             )
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
@@ -116,14 +196,38 @@ class WeatherViewModelTest {
                 visibility = 0,
                 windDegree = 0,
                 windSpeed = 0F,
-                weatherMeta = WeatherMeta(
+                weatherMeta = listOf(WeatherMeta(
                     id = 0,
                     weatherTitle = "",
                     weatherDescription = ""
-                )
+                ))
             ),
             dailyWeatherData = listOf(
-
+                DailyWeatherData(
+                    temp = Temp(
+                        day = 0f,
+                        min = 19f,
+                        max = 22f,
+                        night = 0f,
+                        evening = 0f,
+                        morning = 0f
+                    ),
+                    date = 0L,
+                    sunsetTime = 0L,
+                    sunriseTime = 0L,
+                    moonRiseTime = 0L,
+                    moonSetTime = 0L,
+                    moonPhase = 0F,
+                    feelsLike = FeelsLike(0f, 0f, 0f, 0f),
+                    pressure = 0,
+                    humidity = 0,
+                    dewPoint = 0F,
+                    uvi = 0F,
+                    clouds = 0,
+                    windSpeed = 0F,
+                    windDegree = 0,
+                    weatherMeta = listOf()
+                )
             )
         )
     }

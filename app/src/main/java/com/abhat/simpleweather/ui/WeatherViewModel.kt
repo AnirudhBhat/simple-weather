@@ -29,6 +29,8 @@ class WeatherViewModel(
             val humidity: Int,
             val windSpeed: Float,
             val description: String,
+            val min: Float?,
+            val max: Float?,
             val dailyWeatherData: List<DailyWeatherData>
         ) : ViewState()
 
@@ -62,8 +64,24 @@ class WeatherViewModel(
             feelsLike = weatherResponse.currentDayWeather.feelsLike,
             humidity = weatherResponse.currentDayWeather.humidity,
             windSpeed = weatherResponse.currentDayWeather.windSpeed,
-            description = weatherResponse.currentDayWeather.weatherMeta.weatherDescription,
+            description = weatherResponse.currentDayWeather.weatherMeta[0].weatherDescription,
+            min = getMinTempForCurrentDay(weatherResponse),
+            max = getMaxTempForCurrentDay(weatherResponse),
             dailyWeatherData = weatherResponse.dailyWeatherData
         )
+    }
+
+    private fun getMaxTempForCurrentDay(weatherResponse: WeatherResponse): Float? {
+        if (weatherResponse.dailyWeatherData.isNotEmpty()) {
+            return weatherResponse.dailyWeatherData[0].temp.max
+        }
+        return null
+    }
+
+    private fun getMinTempForCurrentDay(weatherResponse: WeatherResponse): Float? {
+        if (weatherResponse.dailyWeatherData.isNotEmpty()) {
+            return weatherResponse.dailyWeatherData[0].temp.min
+        }
+        return null
     }
 }

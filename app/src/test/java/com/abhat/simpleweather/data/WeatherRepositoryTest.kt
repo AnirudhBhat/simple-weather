@@ -50,11 +50,11 @@ class WeatherRepositoryTest {
                 visibility = 0,
                 windDegree = 0,
                 windSpeed = 0F,
-                weatherMeta = WeatherMeta(
+                weatherMeta = listOf(WeatherMeta(
                     id = 0,
                     weatherTitle = "",
                     weatherDescription = ""
-                )
+                ))
             ),
             dailyWeatherData = listOf(
 

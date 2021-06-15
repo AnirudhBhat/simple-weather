@@ -16,5 +16,5 @@ data class WeatherData(
     @SerializedName("visibility") val visibility: Int,
     @SerializedName("wind_speed") val windSpeed: Float,
     @SerializedName("wind_deg") val windDegree: Int,
-    @SerializedName("weather") val weatherMeta: WeatherMeta
+    @SerializedName("weather") val weatherMeta: List<WeatherMeta>
 )
