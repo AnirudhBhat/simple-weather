@@ -9,10 +9,7 @@ import com.abhat.simpleweather.data.repository.WeatherRepoState
 import com.abhat.simpleweather.data.repository.WeatherRepository
 import com.abhat.simpleweather.ui.CoroutineContextProvider
 import com.abhat.simpleweather.ui.WeatherViewModel
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
@@ -59,8 +56,35 @@ class WeatherViewModelTest {
             weatherViewModel.getWeatherFor(10F, 10F)
 
             // Then
-            verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading)
-            verify(weatherObserver).onChanged(expectedState)
+            val inOrder = inOrder(weatherObserver)
+            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+            inOrder.verify(weatherObserver).onChanged(expectedState)
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper state for error response`() {
+        runBlocking {
+            // Given
+            val error = RuntimeException()
+            val expectedState = WeatherViewModel.ViewState.Error(
+                throwable = error
+            )
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherRepoState.Error(error = error)
+                    ))
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val inOrder = inOrder(weatherObserver)
+            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+            inOrder.verify(weatherObserver).onChanged(expectedState)
         }
     }
 

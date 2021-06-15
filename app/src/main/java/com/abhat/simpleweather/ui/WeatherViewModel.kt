@@ -20,8 +20,9 @@ class WeatherViewModel(
     private val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val viewStateData: LiveData<ViewState> = viewState
 
-    sealed class ViewState {
-        object Loading : ViewState()
+    sealed class ViewState(open var isLoading: Boolean = false) {
+        data class Loading(override var isLoading: Boolean = true) : ViewState()
+
         data class Weather(
             val temp: Float,
             val feelsLike: Float,
@@ -30,10 +31,12 @@ class WeatherViewModel(
             val description: String,
             val dailyWeatherData: List<DailyWeatherData>
         ) : ViewState()
+
+        data class Error(val throwable: Throwable?) : ViewState()
     }
 
     fun getWeatherFor(lat: Float, lon: Float) {
-        viewState.value = ViewState.Loading
+        viewState.value = ViewState.Loading(true)
         viewModelScope.launch(coroutineContextProvider.IO) {
             weatherRepository.getWeatherFor(lat, lon).collect { weatherRepoState ->
                 when (weatherRepoState) {
@@ -44,7 +47,9 @@ class WeatherViewModel(
                         }
                     }
                     is WeatherRepoState.Error -> {
-
+                        withContext(coroutineContextProvider.Main) {
+                            viewState.value = ViewState.Error(weatherRepoState.error)
+                        }
                     }
                 }
             }
