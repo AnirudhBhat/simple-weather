@@ -7,6 +7,7 @@ import com.abhat.simpleweather.data.repository.WeatherRepoState
 import com.abhat.simpleweather.data.repository.WeatherRepository
 import com.abhat.simpleweather.ui.CoroutineContextProvider
 import com.abhat.simpleweather.ui.WeatherViewModel
+import com.abhat.simpleweather.weatherdatasource.WeatherResponseData
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,45 +35,20 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper state for success response`() {
         runBlocking {
             // Given
-            val expectedState = WeatherViewModel.ViewState.Weather(
-                temp = 21.1F,
-                feelsLike = 20.1F,
-                humidity = 0,
-                windSpeed = 0F,
-                description = "",
-                min = 19f,
-                max = 22f,
-                dailyWeatherData = listOf(DailyWeatherData(
-                    temp = Temp(
-                        day = 0f,
-                        min = 19f,
-                        max = 22f,
-                        night = 0f,
-                        evening = 0f,
-                        morning = 0f
-                    ),
-                    date = 0L,
-                    sunsetTime = 0L,
-                    sunriseTime = 0L,
-                    moonRiseTime = 0L,
-                    moonSetTime = 0L,
-                    moonPhase = 0F,
-                    feelsLike = FeelsLike(0f, 0f, 0f, 0f),
-                    pressure = 0,
-                    humidity = 0,
-                    dewPoint = 0F,
-                    uvi = 0F,
-                    clouds = 0,
-                    windSpeed = 0F,
-                    windDegree = 0,
-                    weatherMeta = listOf()
-                ))
-            )
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(weatherResponse = getWeatherResponse())
-                    ))
+                        WeatherRepoState.Success(
+                            weatherResponse = WeatherResponseData.getWeatherResponse(
+                                currentDayWeather = WeatherResponseData.getWeatherData(
+                                    temp = 21.1F,
+                                    feelsLike = 20.1F
+                                ),
+                                dailyWeatherData = listOf(WeatherResponseData.getDailyWeatherData())
+                            )
+                        )
+                    )
+                )
             val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
@@ -80,6 +56,10 @@ class WeatherViewModelTest {
             weatherViewModel.getWeatherFor(10F, 10F)
 
             // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                temp = 21.1F,
+                feelsLike = 20.1F
+            )
             val inOrder = inOrder(weatherObserver)
             inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
             inOrder.verify(weatherObserver).onChanged(expectedState)
@@ -90,45 +70,23 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper state with min and max for success response`() {
         runBlocking {
             // Given
-            val expectedState = WeatherViewModel.ViewState.Weather(
-                temp = 21.1F,
-                feelsLike = 20.1F,
-                humidity = 0,
-                windSpeed = 0F,
-                description = "",
-                min = 19F,
-                max = 22F,
-                dailyWeatherData = listOf(DailyWeatherData(
-                    temp = Temp(
-                        day = 0f,
-                        min = 19f,
-                        max = 22f,
-                        night = 0f,
-                        evening = 0f,
-                        morning = 0f
-                    ),
-                    date = 0L,
-                    sunsetTime = 0L,
-                    sunriseTime = 0L,
-                    moonRiseTime = 0L,
-                    moonSetTime = 0L,
-                    moonPhase = 0F,
-                    feelsLike = FeelsLike(0f, 0f, 0f, 0f),
-                    pressure = 0,
-                    humidity = 0,
-                    dewPoint = 0F,
-                    uvi = 0F,
-                    clouds = 0,
-                    windSpeed = 0F,
-                    windDegree = 0,
-                    weatherMeta = listOf()
-                ))
-            )
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(weatherResponse = getWeatherResponse())
-                    ))
+                        WeatherRepoState.Success(weatherResponse = WeatherResponseData.getWeatherResponse(
+                            currentDayWeather = WeatherResponseData.getWeatherData(
+                                temp = 21.1F,
+                                feelsLike = 20.1F
+                            ),
+                            dailyWeatherData = listOf(WeatherResponseData.getDailyWeatherData(
+                                temp = WeatherResponseData.getTemp(
+                                    min = 19F,
+                                    max = 21F
+                                )
+                            ))
+                        ))
+                    )
+                )
             val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
@@ -136,6 +94,18 @@ class WeatherViewModelTest {
             weatherViewModel.getWeatherFor(10F, 10F)
 
             // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                temp = 21.1F,
+                feelsLike = 20.1F,
+                min = 19F,
+                max = 21F,
+                dailyWeatherData = listOf(WeatherResponseData.getDailyWeatherData(
+                    temp = WeatherResponseData.getTemp(
+                        min = 19F,
+                        max = 21F
+                    )
+                ))
+            )
             val inOrder = inOrder(weatherObserver)
             inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
             inOrder.verify(weatherObserver).onChanged(expectedState)
@@ -147,14 +117,12 @@ class WeatherViewModelTest {
         runBlocking {
             // Given
             val error = RuntimeException()
-            val expectedState = WeatherViewModel.ViewState.Error(
-                throwable = error
-            )
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
                         WeatherRepoState.Error(error = error)
-                    ))
+                    )
+                )
             val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
@@ -162,6 +130,9 @@ class WeatherViewModelTest {
             weatherViewModel.getWeatherFor(10F, 10F)
 
             // Then
+            val expectedState = WeatherViewModel.ViewState.Error(
+                throwable = error
+            )
             val inOrder = inOrder(weatherObserver)
             inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
             inOrder.verify(weatherObserver).onChanged(expectedState)
@@ -169,66 +140,8 @@ class WeatherViewModelTest {
     }
 
 
-
-
     class TestContextProvider : CoroutineContextProvider() {
         override val Main: CoroutineDispatcher = Dispatchers.Unconfined
         override val IO: CoroutineDispatcher = Dispatchers.Unconfined
-    }
-
-    private fun getWeatherResponse(): WeatherResponse {
-        return WeatherResponse(
-            lat = 0F,
-            lon = 0F,
-            timezone = "",
-            timezoneOffset = 0,
-            currentDayWeather = WeatherData(
-                date = 0L,
-                sunriseTime = 0L,
-                sunsetTime = 0L,
-                temp = 21.1F,
-                feelsLike = 20.1F,
-                pressure = 0,
-                humidity = 0,
-                dewPoint = 0F,
-                uvi = 0F,
-                clouds = 0,
-                visibility = 0,
-                windDegree = 0,
-                windSpeed = 0F,
-                weatherMeta = listOf(WeatherMeta(
-                    id = 0,
-                    weatherTitle = "",
-                    weatherDescription = ""
-                ))
-            ),
-            dailyWeatherData = listOf(
-                DailyWeatherData(
-                    temp = Temp(
-                        day = 0f,
-                        min = 19f,
-                        max = 22f,
-                        night = 0f,
-                        evening = 0f,
-                        morning = 0f
-                    ),
-                    date = 0L,
-                    sunsetTime = 0L,
-                    sunriseTime = 0L,
-                    moonRiseTime = 0L,
-                    moonSetTime = 0L,
-                    moonPhase = 0F,
-                    feelsLike = FeelsLike(0f, 0f, 0f, 0f),
-                    pressure = 0,
-                    humidity = 0,
-                    dewPoint = 0F,
-                    uvi = 0F,
-                    clouds = 0,
-                    windSpeed = 0F,
-                    windDegree = 0,
-                    weatherMeta = listOf()
-                )
-            )
-        )
     }
 }
