@@ -87,7 +87,6 @@
         android:id="@+id/iv_weather_image"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        app:srcCompat="@drawable/ic_cloudy"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/tv_humidity"
         app:layout_constraintStart_toStartOf="@id/tv_feels_like"/>

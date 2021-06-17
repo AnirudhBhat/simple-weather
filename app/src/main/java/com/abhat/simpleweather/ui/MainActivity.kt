@@ -4,11 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -134,6 +132,7 @@ class MainActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.tv_description).text = viewState.description
                     findViewById<TextView>(R.id.tv_humidity).text = viewState.humidity.toString() + "%"
                     findViewById<TextView>(R.id.tv_wind_speed).text = viewState.windSpeed.toString() + " km/h"
+                    findViewById<ImageView>(R.id.iv_weather_image).setBackgroundDrawable(ContextCompat.getDrawable(this, viewState.icon))
                     viewState.max?.let { maxTemp ->
                         findViewById<Group>(R.id.group_max_min).visibility = View.VISIBLE
                         findViewById<TextView>(R.id.tv_max_temp).text = maxTemp.roundToInt().toString() + "\u00B0"
