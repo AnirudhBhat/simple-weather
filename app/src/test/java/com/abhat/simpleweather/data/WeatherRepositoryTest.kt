@@ -56,9 +56,8 @@ class WeatherRepositoryTest {
                     weatherDescription = ""
                 ))
             ),
-            dailyWeatherData = listOf(
-
-            )
+            dailyWeatherData = emptyList(),
+            hourlyWeatherData = emptyList()
         )
     }
 

@@ -3,7 +3,7 @@ package com.abhat.simpleweather.data.model
 import com.google.gson.annotations.SerializedName
 
 data class WeatherData(
-    @SerializedName("date") val date: Long,
+    @SerializedName("dt") val date: Long,
     @SerializedName("sunrise") val sunriseTime: Long,
     @SerializedName("sunset") val sunsetTime: Long,
     @SerializedName("temp") val temp: Float,

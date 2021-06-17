@@ -11,7 +11,11 @@ import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.abhat.simpleweather.R
+import com.abhat.simpleweather.data.model.WeatherData
+import com.abhat.simpleweather.data.model.WeatherResponse
 import com.abhat.simpleweather.data.network.WeatherApi
 import com.abhat.simpleweather.data.repository.Repository
 import com.abhat.simpleweather.data.repository.WeatherRepository
@@ -51,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         retrofit.create(WeatherApi::class.java)
     }
 
-    private val repository: Repository by lazy {
+    private val repository: Repository<WeatherResponse> by lazy {
         WeatherRepository(weatherApi = weatherApi)
     }
 
@@ -88,6 +92,8 @@ class MainActivity : AppCompatActivity() {
                     findViewById<TextView>(R.id.tv_temp).text = String.format("%.1f", viewState.temp) + "\u00B0"
                     findViewById<TextView>(R.id.tv_feels_like_temp).text = String.format("%.1f", viewState.feelsLike) + "\u00B0"
                     findViewById<TextView>(R.id.tv_description).text = viewState.description
+                    findViewById<TextView>(R.id.tv_humidity).text = viewState.humidity.toString() + "%"
+                    findViewById<TextView>(R.id.tv_wind_speed).text = viewState.windSpeed.toString() + " km/h"
                     viewState.max?.let { maxTemp ->
                         findViewById<Group>(R.id.group_max_min).visibility = View.VISIBLE
                         findViewById<TextView>(R.id.tv_max_temp).text = String.format("%.1f", maxTemp) + "\u00B0"
@@ -95,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                     } ?: run {
                         findViewById<Group>(R.id.group_max_min).visibility = View.GONE
                     }
+                    setupHourlyRecycler(viewState.hourlyWeatherData)
                 }
 
                 is WeatherViewModel.ViewState.Error -> {
@@ -102,5 +109,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun setupHourlyRecycler(hourlyWeatherData: List<WeatherData>) {
+        val hourlyRecycler = findViewById<RecyclerView>(R.id.rv_hourly_weather)
+        hourlyRecycler.adapter = HourlyWeatherAdapter(hourlyWeatherData)
+        hourlyRecycler.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
     }
 }

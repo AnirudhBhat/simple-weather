@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic__wind.xml" value="0.24537037037037038" />
+        <entry key="app/src/main/res/drawable/ic_drop.xml" value="0.24537037037037038" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/item_hourly_weather_data.xml" value="0.25" />
       </map>
     </option>
   </component>

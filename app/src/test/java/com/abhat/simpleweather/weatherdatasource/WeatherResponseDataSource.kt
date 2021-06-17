@@ -10,10 +10,11 @@ object WeatherResponseData {
         timeZone: String = "",
         timezoneOffset: Int = 0,
         currentDayWeather: WeatherData = getWeatherData(),
-        dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData())
+        dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData()),
+        hourlyWeatherData: List<WeatherData> = listOf(getWeatherData())
     ): WeatherResponse {
         return WeatherResponse(
-            lat, lon, timeZone, timezoneOffset, currentDayWeather, dailyWeatherData
+            lat, lon, timeZone, timezoneOffset, currentDayWeather, dailyWeatherData, hourlyWeatherData
         )
     }
 
@@ -59,10 +60,11 @@ object WeatherResponseData {
         description: String = "",
         min: Float = 0F,
         max: Float = 0F,
-        dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData())
+        dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData()),
+        hourlyWeatherData: List<WeatherData> = listOf(getWeatherData())
     ): WeatherViewModel.ViewState.Weather {
         return WeatherViewModel.ViewState.Weather(
-            temp, feelsLike, humidity, windSpeed, description, min, max, dailyWeatherData
+            temp, feelsLike, humidity, windSpeed, description, min, max, dailyWeatherData, hourlyWeatherData
         )
     }
 

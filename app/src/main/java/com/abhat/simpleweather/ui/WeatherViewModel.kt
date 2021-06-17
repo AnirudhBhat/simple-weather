@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhat.simpleweather.data.model.DailyWeatherData
+import com.abhat.simpleweather.data.model.WeatherData
 import com.abhat.simpleweather.data.model.WeatherResponse
 import com.abhat.simpleweather.data.repository.Repository
 import com.abhat.simpleweather.data.repository.WeatherRepoState
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class WeatherViewModel(
-    private val weatherRepository: Repository,
+    private val weatherRepository: Repository<WeatherResponse>,
     private val coroutineContextProvider: CoroutineContextProvider
 ) : ViewModel() {
 
@@ -31,7 +32,8 @@ class WeatherViewModel(
             val description: String,
             val min: Float?,
             val max: Float?,
-            val dailyWeatherData: List<DailyWeatherData>
+            val dailyWeatherData: List<DailyWeatherData>,
+            val hourlyWeatherData: List<WeatherData>
         ) : ViewState()
 
         data class Error(val throwable: Throwable?) : ViewState()
@@ -67,7 +69,8 @@ class WeatherViewModel(
             description = weatherResponse.currentDayWeather.weatherMeta[0].weatherDescription,
             min = getMinTempForCurrentDay(weatherResponse),
             max = getMaxTempForCurrentDay(weatherResponse),
-            dailyWeatherData = weatherResponse.dailyWeatherData
+            dailyWeatherData = weatherResponse.dailyWeatherData,
+            hourlyWeatherData = weatherResponse.hourlyWeatherData
         )
     }
 

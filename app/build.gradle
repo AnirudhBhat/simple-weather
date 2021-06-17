@@ -43,6 +43,7 @@ dependencies {
     implementation Libraries.coreKtx
     implementation Libraries.viewmodelKtx
     implementation Libraries.constraintLayout
+    implementation Libraries.recyclerView
     implementation Libraries.gson
     implementation Libraries.retrofitgsonconverter
     implementation Libraries.retrofitlogging
