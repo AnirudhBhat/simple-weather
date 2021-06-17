@@ -62,11 +62,12 @@ object WeatherResponseData {
         description: String = "",
         min: Float = 0F,
         max: Float = 0F,
+        icon: Int = R.drawable.ic_sunny,
         dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData()),
         hourlyWeatherData: List<HourlyWeatherData> = listOf(getHourlyWeatherData())
     ): WeatherViewModel.ViewState.Weather {
         return WeatherViewModel.ViewState.Weather(
-            temp, feelsLike, humidity, windSpeed, description, min, max, dailyWeatherData, hourlyWeatherData
+            temp, feelsLike, humidity, windSpeed, description, min, max, icon, dailyWeatherData, hourlyWeatherData
         )
     }
 

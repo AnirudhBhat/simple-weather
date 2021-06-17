@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -28,6 +29,15 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
+
+    private val latLongMap = hashMapOf(
+        "Bengaluru" to Pair(12.9762F, 77.6033F),
+        "Shivamogga" to Pair(13.9167F, 75.5667F),
+        "Udupi" to Pair(13.35F, 74.75F),
+        "Madikeri" to Pair(12.4167F, 75.7333F),
+        "Chikmagaluru" to Pair(13.3167F, 75.7833F),
+        "Ooty" to Pair(11.4F, 76.7F)
+    )
 
     private fun getLogger(): HttpLoggingInterceptor {
         val logger = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger {
@@ -78,6 +88,35 @@ class MainActivity : AppCompatActivity() {
         observeViewModel()
         if (savedInstanceState == null) {
             weatherViewModel.getWeatherFor(12.9762F, 77.6033F)
+        }
+        findViewById<Button>(R.id.btn_bengaluru).setOnClickListener {
+            val pair = latLongMap["Bengaluru"]
+            weatherViewModel.getWeatherFor(pair?.first!!, pair?.second)
+        }
+
+        findViewById<Button>(R.id.btn_shivamogga).setOnClickListener {
+            val pair = latLongMap["Shivamogga"]
+            weatherViewModel.getWeatherFor(pair?.first!!, pair?.second)
+        }
+
+        findViewById<Button>(R.id.btn_udupi).setOnClickListener {
+            val pair = latLongMap["Udupi"]
+            weatherViewModel.getWeatherFor(pair?.first!!, pair?.second)
+        }
+
+        findViewById<Button>(R.id.btn_madikeri).setOnClickListener {
+            val pair = latLongMap["Madikeri"]
+            weatherViewModel.getWeatherFor(pair?.first!!, pair?.second)
+        }
+
+        findViewById<Button>(R.id.btn_chikmagaluru).setOnClickListener {
+            val pair = latLongMap["Chikmagaluru"]
+            weatherViewModel.getWeatherFor(pair?.first!!, pair?.second)
+        }
+
+        findViewById<Button>(R.id.btn_ooty).setOnClickListener {
+            val pair = latLongMap["Ooty"]
+            weatherViewModel.getWeatherFor(pair?.first!!, pair?.second)
         }
     }
 

@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/tv_temp_hourly"
         android:layout_width="wrap_content"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/tv_hour"
         android:layout_marginStart="16dp"
@@ -30,7 +30,7 @@
         tools:text="10am"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:layout_marginTop="200dp"/>
+        android:layout_marginTop="150dp"/>
 
 
     <TextView

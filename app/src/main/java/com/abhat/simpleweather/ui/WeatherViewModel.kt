@@ -1,5 +1,6 @@
 package com.abhat.simpleweather.ui
 
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,7 @@ class WeatherViewModel(
             val description: String,
             val min: Float?,
             val max: Float?,
+            @DrawableRes val icon: Int,
             val dailyWeatherData: List<DailyWeatherData>,
             val hourlyWeatherData: List<HourlyWeatherData>
         ) : ViewState()
@@ -70,6 +72,7 @@ class WeatherViewModel(
             description = weatherResponse.currentDayWeather.weatherMeta[0].weatherDescription,
             min = getMinTempForCurrentDay(weatherResponse),
             max = getMaxTempForCurrentDay(weatherResponse),
+            icon = getWeatherIconFrom(weatherResponse.currentDayWeather.weatherMeta[0].weatherDescription),
             dailyWeatherData = weatherResponse.dailyWeatherData,
             hourlyWeatherData = hourlyWeatherMapper(weatherResponse.hourlyWeatherData)
         )
