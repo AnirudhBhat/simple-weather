@@ -2,6 +2,7 @@ package com.abhat.simpleweather.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.abhat.simpleweather.R
 import com.abhat.simpleweather.data.model.*
 import com.abhat.simpleweather.data.repository.WeatherRepoState
 import com.abhat.simpleweather.data.repository.WeatherRepository
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,8 +60,9 @@ class WeatherViewModelTest {
             // Then
             val expectedState = WeatherResponseData.getWeatherState(
                 temp = 21.1F,
-                feelsLike = 20.1F
+                feelsLike = 20.1F,
             )
+//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
             val inOrder = inOrder(weatherObserver)
             inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
             inOrder.verify(weatherObserver).onChanged(expectedState)
@@ -73,18 +76,22 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(weatherResponse = WeatherResponseData.getWeatherResponse(
-                            currentDayWeather = WeatherResponseData.getWeatherData(
-                                temp = 21.1F,
-                                feelsLike = 20.1F
-                            ),
-                            dailyWeatherData = listOf(WeatherResponseData.getDailyWeatherData(
-                                temp = WeatherResponseData.getTemp(
-                                    min = 19F,
-                                    max = 21F
+                        WeatherRepoState.Success(
+                            weatherResponse = WeatherResponseData.getWeatherResponse(
+                                currentDayWeather = WeatherResponseData.getWeatherData(
+                                    temp = 21.1F,
+                                    feelsLike = 20.1F
+                                ),
+                                dailyWeatherData = listOf(
+                                    WeatherResponseData.getDailyWeatherData(
+                                        temp = WeatherResponseData.getTemp(
+                                            min = 19F,
+                                            max = 21F
+                                        )
+                                    )
                                 )
-                            ))
-                        ))
+                            )
+                        )
                     )
                 )
             val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
@@ -99,12 +106,14 @@ class WeatherViewModelTest {
                 feelsLike = 20.1F,
                 min = 19F,
                 max = 21F,
-                dailyWeatherData = listOf(WeatherResponseData.getDailyWeatherData(
-                    temp = WeatherResponseData.getTemp(
-                        min = 19F,
-                        max = 21F
+                dailyWeatherData = listOf(
+                    WeatherResponseData.getDailyWeatherData(
+                        temp = WeatherResponseData.getTemp(
+                            min = 19F,
+                            max = 21F
+                        )
                     )
-                ))
+                )
             )
             val inOrder = inOrder(weatherObserver)
             inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
@@ -113,14 +122,24 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `fetching weather details must return proper state along with hourly details for success response`() {
+    fun `fetching weather details must return proper hourly details with proper icon when weather is thunderstorm`() {
         runBlocking {
             // Given
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
                         WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse()
+                            weatherResponse = WeatherResponseData.getWeatherResponse(
+                                hourlyWeatherData = listOf(
+                                    WeatherResponseData.getWeatherData(
+                                        weatherMeta = listOf(
+                                            WeatherResponseData.getWeatherMeta(
+                                                description = "thunderstorm"
+                                            )
+                                        )
+                                    )
+                                )
+                            )
                         )
                     )
                 )
@@ -131,7 +150,186 @@ class WeatherViewModelTest {
             weatherViewModel.getWeatherFor(10F, 10F)
 
             // Then
-            val expectedState = WeatherResponseData.getWeatherState()
+            val expectedState = WeatherResponseData.getWeatherState(
+                hourlyWeatherData = listOf(
+                    WeatherResponseData.getHourlyWeatherData(
+                        status = "thunderstorm",
+                        icon = R.drawable.ic_thunderstorm
+                    )
+                )
+            )
+            val inOrder = inOrder(weatherObserver)
+            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+            inOrder.verify(weatherObserver).onChanged(expectedState)
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper hourly details with proper icon when weather is cloudy`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherRepoState.Success(
+                            weatherResponse = WeatherResponseData.getWeatherResponse(
+                                hourlyWeatherData = listOf(
+                                    WeatherResponseData.getWeatherData(
+                                        weatherMeta = listOf(
+                                            WeatherResponseData.getWeatherMeta(
+                                                description = "broken clouds"
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                hourlyWeatherData = listOf(
+                    WeatherResponseData.getHourlyWeatherData(
+                        status = "broken clouds",
+                        icon = R.drawable.ic_partly_cloudy
+                    )
+                )
+            )
+            val inOrder = inOrder(weatherObserver)
+            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+            inOrder.verify(weatherObserver).onChanged(expectedState)
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper hourly details with proper icon when weather is scattered clouds`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherRepoState.Success(
+                            weatherResponse = WeatherResponseData.getWeatherResponse(
+                                hourlyWeatherData = listOf(
+                                    WeatherResponseData.getWeatherData(
+                                        weatherMeta = listOf(
+                                            WeatherResponseData.getWeatherMeta(
+                                                description = "scattered clouds"
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                hourlyWeatherData = listOf(
+                    WeatherResponseData.getHourlyWeatherData(
+                        status = "scattered clouds",
+                        icon = R.drawable.ic_cloudy
+                    )
+                )
+            )
+            val inOrder = inOrder(weatherObserver)
+            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+            inOrder.verify(weatherObserver).onChanged(expectedState)
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper hourly details with proper icon when weather is moderate rain`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherRepoState.Success(
+                            weatherResponse = WeatherResponseData.getWeatherResponse(
+                                hourlyWeatherData = listOf(
+                                    WeatherResponseData.getWeatherData(
+                                        weatherMeta = listOf(
+                                            WeatherResponseData.getWeatherMeta(
+                                                description = "moderate rain"
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                hourlyWeatherData = listOf(
+                    WeatherResponseData.getHourlyWeatherData(
+                        status = "moderate rain",
+                        icon = R.drawable.ic_moderate_rain
+                    )
+                )
+            )
+            val inOrder = inOrder(weatherObserver)
+            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+            inOrder.verify(weatherObserver).onChanged(expectedState)
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper hourly details with proper icon when weather is light rain`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherRepoState.Success(
+                            weatherResponse = WeatherResponseData.getWeatherResponse(
+                                hourlyWeatherData = listOf(
+                                    WeatherResponseData.getWeatherData(
+                                        weatherMeta = listOf(
+                                            WeatherResponseData.getWeatherMeta(
+                                                description = "light rain"
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                hourlyWeatherData = listOf(
+                    WeatherResponseData.getHourlyWeatherData(
+                        status = "light rain",
+                        icon = R.drawable.ic_light_rain
+                    )
+                )
+            )
             val inOrder = inOrder(weatherObserver)
             inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
             inOrder.verify(weatherObserver).onChanged(expectedState)

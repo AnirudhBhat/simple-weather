@@ -1,6 +1,8 @@
 package com.abhat.simpleweather.weatherdatasource
 
+import com.abhat.simpleweather.R
 import com.abhat.simpleweather.data.model.*
+import com.abhat.simpleweather.ui.HourlyWeatherData
 import com.abhat.simpleweather.ui.WeatherViewModel
 
 object WeatherResponseData {
@@ -61,10 +63,34 @@ object WeatherResponseData {
         min: Float = 0F,
         max: Float = 0F,
         dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData()),
-        hourlyWeatherData: List<WeatherData> = listOf(getWeatherData())
+        hourlyWeatherData: List<HourlyWeatherData> = listOf(getHourlyWeatherData())
     ): WeatherViewModel.ViewState.Weather {
         return WeatherViewModel.ViewState.Weather(
             temp, feelsLike, humidity, windSpeed, description, min, max, dailyWeatherData, hourlyWeatherData
+        )
+    }
+
+    fun getHourlyWeatherData(
+        temp: Float = 0F,
+        feelsLike: Float = 0F,
+        status: String = "",
+        icon: Int = R.drawable.ic_sunny): HourlyWeatherData {
+        return HourlyWeatherData(
+            date = 0L,
+            sunriseTime = 0L,
+            sunsetTime = 0L,
+            temp = 0F,
+            feelsLike = 0F,
+            pressure = 0,
+            humidity = 0,
+            dewPoint = 0F,
+            uvi = 0F,
+            clouds = 0,
+            visibility = 0,
+            windSpeed = 0F,
+            windDegree = 0,
+            weatherMeta = listOf(getWeatherMeta(description = status)),
+            icon = icon
         )
     }
 

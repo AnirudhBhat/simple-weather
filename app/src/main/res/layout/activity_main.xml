@@ -105,7 +105,7 @@
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="24dp"/>
 
     <TextView
         android:id="@+id/tv_min_temp"
@@ -118,7 +118,7 @@
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="24dp"/>
 
     <View
         android:id="@+id/view_min_max"
@@ -147,9 +147,9 @@
         android:layout_marginStart="16dp"
         android:text="Hourly Forcast"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="22sp"
         android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="24dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_hourly_weather"

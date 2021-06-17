@@ -25,6 +25,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -89,15 +90,15 @@ class MainActivity : AppCompatActivity() {
             }
             when (viewState) {
                 is WeatherViewModel.ViewState.Weather -> {
-                    findViewById<TextView>(R.id.tv_temp).text = String.format("%.1f", viewState.temp) + "\u00B0"
-                    findViewById<TextView>(R.id.tv_feels_like_temp).text = String.format("%.1f", viewState.feelsLike) + "\u00B0"
+                    findViewById<TextView>(R.id.tv_temp).text = viewState.temp.roundToInt().toString() + "\u00B0"
+                    findViewById<TextView>(R.id.tv_feels_like_temp).text = viewState.feelsLike.roundToInt().toString() + "\u00B0"
                     findViewById<TextView>(R.id.tv_description).text = viewState.description
                     findViewById<TextView>(R.id.tv_humidity).text = viewState.humidity.toString() + "%"
                     findViewById<TextView>(R.id.tv_wind_speed).text = viewState.windSpeed.toString() + " km/h"
                     viewState.max?.let { maxTemp ->
                         findViewById<Group>(R.id.group_max_min).visibility = View.VISIBLE
-                        findViewById<TextView>(R.id.tv_max_temp).text = String.format("%.1f", maxTemp) + "\u00B0"
-                        findViewById<TextView>(R.id.tv_min_temp).text = String.format("%.1f", viewState.min) + "\u00B0"
+                        findViewById<TextView>(R.id.tv_max_temp).text = maxTemp.roundToInt().toString() + "\u00B0"
+                        findViewById<TextView>(R.id.tv_min_temp).text = viewState.min?.roundToInt()?.toString() + "\u00B0"
                     } ?: run {
                         findViewById<Group>(R.id.group_max_min).visibility = View.GONE
                     }
@@ -111,7 +112,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun setupHourlyRecycler(hourlyWeatherData: List<WeatherData>) {
+    private fun setupHourlyRecycler(hourlyWeatherData: List<HourlyWeatherData>) {
         val hourlyRecycler = findViewById<RecyclerView>(R.id.rv_hourly_weather)
         hourlyRecycler.adapter = HourlyWeatherAdapter(hourlyWeatherData)
         hourlyRecycler.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)

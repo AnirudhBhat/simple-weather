@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhat.simpleweather.R
 import com.abhat.simpleweather.data.model.DailyWeatherData
 import com.abhat.simpleweather.data.model.WeatherData
 import com.abhat.simpleweather.data.model.WeatherResponse
@@ -33,7 +34,7 @@ class WeatherViewModel(
             val min: Float?,
             val max: Float?,
             val dailyWeatherData: List<DailyWeatherData>,
-            val hourlyWeatherData: List<WeatherData>
+            val hourlyWeatherData: List<HourlyWeatherData>
         ) : ViewState()
 
         data class Error(val throwable: Throwable?) : ViewState()
@@ -70,8 +71,62 @@ class WeatherViewModel(
             min = getMinTempForCurrentDay(weatherResponse),
             max = getMaxTempForCurrentDay(weatherResponse),
             dailyWeatherData = weatherResponse.dailyWeatherData,
-            hourlyWeatherData = weatherResponse.hourlyWeatherData
+            hourlyWeatherData = hourlyWeatherMapper(weatherResponse.hourlyWeatherData)
         )
+    }
+
+    private fun hourlyWeatherMapper(hourlyWeatherData: List<WeatherData>): List<HourlyWeatherData> {
+        return hourlyWeatherData.map { weatherData ->
+            HourlyWeatherData(
+                date = weatherData.date,
+                sunsetTime = weatherData.sunsetTime,
+                sunriseTime = weatherData.sunriseTime,
+                temp = weatherData.temp,
+                feelsLike = weatherData.feelsLike,
+                pressure = weatherData.pressure,
+                humidity = weatherData.humidity,
+                dewPoint = weatherData.dewPoint,
+                uvi = weatherData.uvi,
+                clouds = weatherData.clouds,
+                visibility = weatherData.visibility,
+                windSpeed = weatherData.windSpeed,
+                windDegree = weatherData.windDegree,
+                weatherMeta = weatherData.weatherMeta,
+                icon = getWeatherIconFrom(weatherData.weatherMeta[0].weatherDescription)
+            )
+        }
+    }
+
+    private fun getWeatherIconFrom(status: String): Int {
+        return when {
+            status.contains("scattered cloud") -> {
+                R.drawable.ic_cloudy
+            }
+            status.contains("broken clouds") -> {
+                R.drawable.ic_partly_cloudy
+            }
+            status.contains("overcast") -> {
+                R.drawable.ic_cloudy
+            }
+            status.contains("thunderstorm") -> {
+                R.drawable.ic_thunderstorm
+            }
+            status.contains("moderate rain") -> {
+                R.drawable.ic_moderate_rain
+            }
+            status.contains("light rain") -> {
+                R.drawable.ic_light_rain
+            }
+            status.contains("rain") -> {
+                R.drawable.ic_moderate_rain
+            }
+            status.contains("clear") -> {
+                R.drawable.ic_sunny
+            }
+            else -> {
+                R.drawable.ic_sunny
+            }
+        }
     }
 
     private fun getMaxTempForCurrentDay(weatherResponse: WeatherResponse): Float? {
