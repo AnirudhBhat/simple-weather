@@ -36,11 +36,29 @@ class WeatherViewModel(
             val max: Float?,
             @DrawableRes val icon: Int,
             val dailyWeatherData: List<DailyWeatherData>,
-            val hourlyWeatherData: List<HourlyWeatherData>
+            val hourlyWeatherData: List<HourlyWeatherData>,
+            val today: TodayWeather
         ) : ViewState()
 
         data class Error(val throwable: Throwable?) : ViewState()
     }
+
+    data class TodayWeather(
+        val tempDay: Float,
+        val feelsLikeDay: Float,
+        val tempEvening: Float,
+        val feelsLikeEvening: Float,
+        val tempNight: Float,
+        val feelsLikeNight: Float,
+        val tempMorning: Float,
+        val feelsLikeMorning: Float,
+        val humidity: Int,
+        val windSpeed: Float,
+        val description: String,
+        val min: Float?,
+        val max: Float?,
+        @DrawableRes val icon: Int,
+    )
 
     fun getWeatherFor(lat: Float, lon: Float) {
         viewState.value = ViewState.Loading(true)
@@ -74,7 +92,27 @@ class WeatherViewModel(
             max = getMaxTempForCurrentDay(weatherResponse),
             icon = getWeatherIconFrom(weatherResponse.currentDayWeather.weatherMeta[0].weatherDescription),
             dailyWeatherData = weatherResponse.dailyWeatherData,
-            hourlyWeatherData = hourlyWeatherMapper(weatherResponse.hourlyWeatherData)
+            hourlyWeatherData = hourlyWeatherMapper(weatherResponse.hourlyWeatherData),
+            today = todayWeatherMapper(weatherResponse.dailyWeatherData[0])
+        )
+    }
+
+    private fun todayWeatherMapper(dailyWeatherData: DailyWeatherData): TodayWeather {
+        return TodayWeather(
+            tempDay = dailyWeatherData.temp.day,
+            feelsLikeDay = dailyWeatherData.feelsLike.day,
+            tempMorning = dailyWeatherData.temp.morning,
+            feelsLikeMorning = dailyWeatherData.feelsLike.morning,
+            tempEvening = dailyWeatherData.temp.evening,
+            feelsLikeEvening = dailyWeatherData.feelsLike.evening,
+            tempNight = dailyWeatherData.temp.night,
+            feelsLikeNight = dailyWeatherData.feelsLike.night,
+            humidity = dailyWeatherData.humidity,
+            windSpeed = dailyWeatherData.windSpeed,
+            description = dailyWeatherData.weatherMeta[0].weatherDescription,
+            min = dailyWeatherData.temp.min,
+            max = dailyWeatherData.temp.max,
+            icon = getWeatherIconFrom(dailyWeatherData.weatherMeta[0].weatherDescription)
         )
     }
 
@@ -108,8 +146,14 @@ class WeatherViewModel(
             status.contains("broken clouds") -> {
                 R.drawable.ic_partly_cloudy
             }
+            status.contains("few clouds") -> {
+                R.drawable.ic_partly_cloudy
+            }
             status.contains("overcast") -> {
                 R.drawable.ic_cloudy
+            }
+            status.contains("cloud") -> {
+                R.drawable.ic_partly_cloudy
             }
             status.contains("thunderstorm") -> {
                 R.drawable.ic_thunderstorm

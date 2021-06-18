@@ -16,7 +16,13 @@ object WeatherResponseData {
         hourlyWeatherData: List<WeatherData> = listOf(getWeatherData())
     ): WeatherResponse {
         return WeatherResponse(
-            lat, lon, timeZone, timezoneOffset, currentDayWeather, dailyWeatherData, hourlyWeatherData
+            lat,
+            lon,
+            timeZone,
+            timezoneOffset,
+            currentDayWeather,
+            dailyWeatherData,
+            hourlyWeatherData
         )
     }
 
@@ -64,10 +70,40 @@ object WeatherResponseData {
         max: Float = 0F,
         icon: Int = R.drawable.ic_sunny,
         dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData()),
-        hourlyWeatherData: List<HourlyWeatherData> = listOf(getHourlyWeatherData())
+        hourlyWeatherData: List<HourlyWeatherData> = listOf(getHourlyWeatherData()),
+        today: WeatherViewModel.TodayWeather = getTodayWeather(description, icon)
     ): WeatherViewModel.ViewState.Weather {
         return WeatherViewModel.ViewState.Weather(
-            temp, feelsLike, humidity, windSpeed, description, min, max, icon, dailyWeatherData, hourlyWeatherData
+            temp,
+            feelsLike,
+            humidity,
+            windSpeed,
+            description,
+            min,
+            max,
+            icon,
+            dailyWeatherData,
+            hourlyWeatherData,
+            today
+        )
+    }
+
+    fun getTodayWeather(description: String = "", icon: Int): WeatherViewModel.TodayWeather {
+        return WeatherViewModel.TodayWeather(
+            tempDay = 0F,
+            feelsLikeDay = 0F,
+            tempEvening = 0F,
+            feelsLikeEvening = 0F,
+            tempNight = 0F,
+            feelsLikeNight = 0F,
+            tempMorning = 0F,
+            feelsLikeMorning = 0F,
+            humidity = 0,
+            windSpeed = 0F,
+            description = description,
+            min = 0F,
+            max = 0F,
+            icon = icon
         )
     }
 
@@ -75,7 +111,8 @@ object WeatherResponseData {
         temp: Float = 0F,
         feelsLike: Float = 0F,
         status: String = "",
-        icon: Int = R.drawable.ic_sunny): HourlyWeatherData {
+        icon: Int = R.drawable.ic_sunny
+    ): HourlyWeatherData {
         return HourlyWeatherData(
             date = 0L,
             sunriseTime = 0L,

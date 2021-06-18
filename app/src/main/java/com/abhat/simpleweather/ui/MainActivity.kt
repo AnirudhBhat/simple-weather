@@ -127,6 +127,7 @@ class MainActivity : AppCompatActivity() {
             }
             when (viewState) {
                 is WeatherViewModel.ViewState.Weather -> {
+                    // Current time weather
                     findViewById<TextView>(R.id.tv_temp).text = viewState.temp.roundToInt().toString() + "\u00B0"
                     findViewById<TextView>(R.id.tv_feels_like_temp).text = viewState.feelsLike.roundToInt().toString() + "\u00B0"
                     findViewById<TextView>(R.id.tv_description).text = viewState.description
@@ -140,6 +141,25 @@ class MainActivity : AppCompatActivity() {
                     } ?: run {
                         findViewById<Group>(R.id.group_max_min).visibility = View.GONE
                     }
+
+                    // Today weather
+                    findViewById<TextView>(R.id.tv_today_weather).text = viewState.today.tempDay.roundToInt().toString() + "\u00B0"
+                    findViewById<TextView>(R.id.tv_today_feels_like_temp).text = viewState.today.feelsLikeDay.roundToInt().toString() + "\u00B0"
+                    findViewById<TextView>(R.id.tv_today_weather_description).text = viewState.today.description
+                    findViewById<ImageView>(R.id.iv_today_weather).setBackgroundDrawable(ContextCompat.getDrawable(this, viewState.today.icon))
+
+                    // Morning weather
+                    findViewById<TextView>(R.id.tv_morning_weather).text = viewState.today.tempMorning.roundToInt().toString() + "\u00B0"
+                    findViewById<TextView>(R.id.tv_morning_feels_like_temp).text = viewState.today.feelsLikeMorning.roundToInt().toString() + "\u00B0"
+
+                    // Evening weather
+                    findViewById<TextView>(R.id.tv_evening_weather).text = viewState.today.tempEvening.roundToInt().toString() + "\u00B0"
+                    findViewById<TextView>(R.id.tv_evening_feels_like_temp).text = viewState.today.feelsLikeEvening.roundToInt().toString() + "\u00B0"
+
+                    // Night weather
+                    findViewById<TextView>(R.id.tv_night_weather).text = viewState.today.tempNight.roundToInt().toString() + "\u00B0"
+                    findViewById<TextView>(R.id.tv_night_feels_like_temp).text = viewState.today.feelsLikeNight.roundToInt().toString() + "\u00B0"
+
                     setupHourlyRecycler(viewState.hourlyWeatherData)
                 }
 
