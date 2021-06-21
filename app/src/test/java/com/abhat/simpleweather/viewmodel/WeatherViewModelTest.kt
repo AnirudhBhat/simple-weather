@@ -865,6 +865,58 @@ class WeatherViewModelTest {
     }
 
     @Test
+    fun `fetching weather humidity must return proper humidity for success response`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherDataWithTempDetails(humidity = 65)
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                humidity = 65
+            )
+            Assert.assertEquals(expectedState.humidity, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).humidity)
+        }
+    }
+
+    @Test
+    fun `fetching weather windspeed must return proper windspeed for success response`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherDataWithTempDetails(windSpeed = 9.5F)
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                windSpeed = 9.5F
+            )
+            Assert.assertEquals(expectedState.windSpeed, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).windSpeed)
+        }
+    }
+
+    @Test
     fun `fetching weather details must return proper state for error response`() {
         runBlocking {
             // Given

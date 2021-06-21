@@ -241,12 +241,14 @@ object WeatherResponseData {
     }
 
     fun getCloudsWeatherDataWithTempDetails(
-        min: Float = 0F,
-        max: Float = 0F,
+        humidity: Int = 0,
+        windSpeed: Float = 0F,
         temp: Float = 0F,
         feelsLike: Float = 0F
     ): WeatherData {
         return getWeatherData(
+            windSpeed = windSpeed,
+            humidity = humidity,
             temp = temp,
             feelsLike = feelsLike
         )
