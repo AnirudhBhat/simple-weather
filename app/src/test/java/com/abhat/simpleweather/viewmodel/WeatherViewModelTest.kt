@@ -12,6 +12,7 @@ import com.abhat.simpleweather.weatherdatasource.WeatherResponseData
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
@@ -77,16 +78,10 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                dailyWeatherData = listOf(
-                                    WeatherResponseData.getDailyWeatherData(
-                                        weatherMeta = listOf(WeatherResponseData.getWeatherMeta(
-                                            description = "clear"
-                                        ))
-                                    ),
-                                    WeatherResponseData.getDailyWeatherData(date = 1L)
-                                )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherData("clear"),
+                                WeatherResponseData.getCloudsDailyWeatherData("moderate rain")
                             )
                         )
                     )
@@ -99,25 +94,242 @@ class WeatherViewModelTest {
 
             // Then
             val expectedState = WeatherResponseData.getWeatherState(
-                dailyWeatherData = listOf(
-                    WeatherResponseData.getDailyWeatherData(
-                        weatherMeta = listOf(
-                            WeatherResponseData.getWeatherMeta(
-                                description = "clear"
-                            )
-                        )
-                    ),
-                    WeatherResponseData.getDailyWeatherData(date = 1L)
-                ),
                 today = WeatherResponseData.getTodayWeather(
                     description = "clear",
                     icon = R.drawable.ic_sunny
                 )
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.today.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.description
+            )
+            Assert.assertEquals(
+                expectedState.today.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.icon
+            )
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper today weather icon when weather is scattered clouds`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherData("scattered clouds"),
+                                WeatherResponseData.getCloudsDailyWeatherData("moderate rain")
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                today = WeatherResponseData.getTodayWeather(
+                    description = "scattered clouds",
+                    icon = R.drawable.ic_cloudy
+                )
+            )
+            Assert.assertEquals(
+                expectedState.today.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.description
+            )
+            Assert.assertEquals(
+                expectedState.today.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.icon
+            )
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper today weather icon when weather is broken clouds`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherData("broken clouds")
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                today = WeatherResponseData.getTodayWeather(
+                    description = "broken clouds",
+                    icon = R.drawable.ic_partly_cloudy
+                )
+            )
+            Assert.assertEquals(
+                expectedState.today.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.description
+            )
+            Assert.assertEquals(
+                expectedState.today.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.icon
+            )
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper today weather icon when weather is random clouds`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherData("random clouds")
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                today = WeatherResponseData.getTodayWeather(
+                    description = "random clouds",
+                    icon = R.drawable.ic_partly_cloudy
+                )
+            )
+            Assert.assertEquals(
+                expectedState.today.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.description
+            )
+            Assert.assertEquals(
+                expectedState.today.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.icon
+            )
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper today weather icon when weather is thunderstorm`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherData("thunderstorm")
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                today = WeatherResponseData.getTodayWeather(
+                    description = "thunderstorm",
+                    icon = R.drawable.ic_thunderstorm
+                )
+            )
+            Assert.assertEquals(
+                expectedState.today.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.description
+            )
+            Assert.assertEquals(
+                expectedState.today.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.icon
+            )
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper today weather icon when weather is light rain`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherData("light rain")
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                today = WeatherResponseData.getTodayWeather(
+                    description = "light rain",
+                    icon = R.drawable.ic_light_rain
+                )
+            )
+            Assert.assertEquals(
+                expectedState.today.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.description
+            )
+            Assert.assertEquals(
+                expectedState.today.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.icon
+            )
+        }
+    }
+
+    @Test
+    fun `fetching weather details must return proper today weather icon when weather is moderate rain`() {
+        runBlocking {
+            // Given
+            whenever(weatherRepository.getWeatherFor(any(), any()))
+                .thenReturn(
+                    flowOf(
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherData("moderate rain")
+                            )
+                        )
+                    )
+                )
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getWeatherFor(10F, 10F)
+
+            // Then
+            val expectedState = WeatherResponseData.getWeatherState(
+                today = WeatherResponseData.getTodayWeather(
+                    description = "moderate rain",
+                    icon = R.drawable.ic_moderate_rain
+                )
+            )
+            Assert.assertEquals(expectedState.today.description, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.description)
+            Assert.assertEquals(expectedState.today.icon, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).today.icon)
         }
     }
 
@@ -128,16 +340,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "clear"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("clear")
                         )
                     )
                 )
@@ -152,10 +356,14 @@ class WeatherViewModelTest {
                 description = "clear",
                 icon = R.drawable.ic_sunny
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
         }
     }
 
@@ -166,16 +374,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "few clouds"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("few clouds")
                         )
                     )
                 )
@@ -190,10 +390,14 @@ class WeatherViewModelTest {
                 description = "few clouds",
                 icon = R.drawable.ic_partly_cloudy
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
         }
     }
 
@@ -204,16 +408,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "random clouds"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("random clouds")
                         )
                     )
                 )
@@ -228,10 +424,14 @@ class WeatherViewModelTest {
                 description = "random clouds",
                 icon = R.drawable.ic_partly_cloudy
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
         }
     }
 
@@ -242,16 +442,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "broken clouds"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("broken clouds")
                         )
                     )
                 )
@@ -266,10 +458,8 @@ class WeatherViewModelTest {
                 description = "broken clouds",
                 icon = R.drawable.ic_partly_cloudy
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(expectedState.description, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description)
+            Assert.assertEquals(expectedState.icon, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon)
         }
     }
 
@@ -280,16 +470,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "scattered clouds"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("scattered clouds")
                         )
                     )
                 )
@@ -304,10 +486,17 @@ class WeatherViewModelTest {
                 description = "scattered clouds",
                 icon = R.drawable.ic_cloudy
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
+//            val inOrder = inOrder(weatherObserver)
+//            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
+//            inOrder.verify(weatherObserver).onChanged(expectedState)
         }
     }
 
@@ -318,16 +507,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "overcast clouds"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("overcast clouds")
                         )
                     )
                 )
@@ -342,10 +523,14 @@ class WeatherViewModelTest {
                 description = "overcast clouds",
                 icon = R.drawable.ic_cloudy
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
         }
     }
 
@@ -356,16 +541,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "light rain"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("light rain")
                         )
                     )
                 )
@@ -380,10 +557,14 @@ class WeatherViewModelTest {
                 description = "light rain",
                 icon = R.drawable.ic_light_rain
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
         }
     }
 
@@ -394,16 +575,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "moderate rain"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("moderate rain")
                         )
                     )
                 )
@@ -418,10 +591,14 @@ class WeatherViewModelTest {
                 description = "moderate rain",
                 icon = R.drawable.ic_moderate_rain
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
         }
     }
 
@@ -432,16 +609,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    weatherMeta = listOf(
-                                        WeatherResponseData.getWeatherMeta(
-                                            description = "thunderstorm"
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("thunderstorm")
                         )
                     )
                 )
@@ -456,10 +625,14 @@ class WeatherViewModelTest {
                 description = "thunderstorm",
                 icon = R.drawable.ic_thunderstorm
             )
-//            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.description,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).description
+            )
+            Assert.assertEquals(
+                expectedState.icon,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).icon
+            )
         }
     }
 
@@ -470,19 +643,11 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                currentDayWeather = WeatherResponseData.getWeatherData(
-                                    temp = 21.1F,
-                                    feelsLike = 20.1F
-                                ),
-                                dailyWeatherData = listOf(
-                                    WeatherResponseData.getDailyWeatherData(
-                                        temp = WeatherResponseData.getTemp(
-                                            min = 19F,
-                                            max = 21F
-                                        )
-                                    )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            dailyWeatherData = listOf(
+                                WeatherResponseData.getCloudsDailyWeatherDataWithTempDetails(
+                                    min = 19F,
+                                    max = 21F
                                 )
                             )
                         )
@@ -496,22 +661,17 @@ class WeatherViewModelTest {
 
             // Then
             val expectedState = WeatherResponseData.getWeatherState(
-                temp = 21.1F,
-                feelsLike = 20.1F,
                 min = 19F,
-                max = 21F,
-                dailyWeatherData = listOf(
-                    WeatherResponseData.getDailyWeatherData(
-                        temp = WeatherResponseData.getTemp(
-                            min = 19F,
-                            max = 21F
-                        )
-                    )
-                )
+                max = 21F
             )
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.min,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).min
+            )
+            Assert.assertEquals(
+                expectedState.max,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).max
+            )
         }
     }
 
@@ -522,18 +682,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                hourlyWeatherData = listOf(
-                                    WeatherResponseData.getWeatherData(
-                                        weatherMeta = listOf(
-                                            WeatherResponseData.getWeatherMeta(
-                                                description = "thunderstorm"
-                                            )
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("thunderstorm"))
                         )
                     )
                 )
@@ -552,9 +702,10 @@ class WeatherViewModelTest {
                     )
                 )
             )
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(
+                expectedState.hourlyWeatherData,
+                (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).hourlyWeatherData
+            )
         }
     }
 
@@ -565,18 +716,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                hourlyWeatherData = listOf(
-                                    WeatherResponseData.getWeatherData(
-                                        weatherMeta = listOf(
-                                            WeatherResponseData.getWeatherMeta(
-                                                description = "broken clouds"
-                                            )
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("broken clouds"))
                         )
                     )
                 )
@@ -595,9 +736,7 @@ class WeatherViewModelTest {
                     )
                 )
             )
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(expectedState.hourlyWeatherData, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).hourlyWeatherData)
         }
     }
 
@@ -608,18 +747,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                hourlyWeatherData = listOf(
-                                    WeatherResponseData.getWeatherData(
-                                        weatherMeta = listOf(
-                                            WeatherResponseData.getWeatherMeta(
-                                                description = "scattered clouds"
-                                            )
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("scattered clouds"))
                         )
                     )
                 )
@@ -638,9 +767,7 @@ class WeatherViewModelTest {
                     )
                 )
             )
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(expectedState.hourlyWeatherData, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).hourlyWeatherData)
         }
     }
 
@@ -651,18 +778,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                hourlyWeatherData = listOf(
-                                    WeatherResponseData.getWeatherData(
-                                        weatherMeta = listOf(
-                                            WeatherResponseData.getWeatherMeta(
-                                                description = "moderate rain"
-                                            )
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("moderate rain"))
                         )
                     )
                 )
@@ -681,9 +798,7 @@ class WeatherViewModelTest {
                     )
                 )
             )
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(expectedState.hourlyWeatherData, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).hourlyWeatherData)
         }
     }
 
@@ -694,18 +809,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                hourlyWeatherData = listOf(
-                                    WeatherResponseData.getWeatherData(
-                                        weatherMeta = listOf(
-                                            WeatherResponseData.getWeatherMeta(
-                                                description = "light rain"
-                                            )
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("light rain"))
                         )
                     )
                 )
@@ -724,9 +829,7 @@ class WeatherViewModelTest {
                     )
                 )
             )
-            val inOrder = inOrder(weatherObserver)
-            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(expectedState.hourlyWeatherData, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).hourlyWeatherData)
         }
     }
 
@@ -737,18 +840,8 @@ class WeatherViewModelTest {
             whenever(weatherRepository.getWeatherFor(any(), any()))
                 .thenReturn(
                     flowOf(
-                        WeatherRepoState.Success(
-                            weatherResponse = WeatherResponseData.getWeatherResponse(
-                                hourlyWeatherData = listOf(
-                                    WeatherResponseData.getWeatherData(
-                                        weatherMeta = listOf(
-                                            WeatherResponseData.getWeatherMeta(
-                                                description = "clear"
-                                            )
-                                        )
-                                    )
-                                )
-                            )
+                        WeatherResponseData.getSuccessWeatherRepoState(
+                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("sunny"))
                         )
                     )
                 )
@@ -762,15 +855,12 @@ class WeatherViewModelTest {
             val expectedState = WeatherResponseData.getWeatherState(
                 hourlyWeatherData = listOf(
                     WeatherResponseData.getHourlyWeatherData(
-                        status = "clear",
+                        status = "sunny",
                         icon = R.drawable.ic_sunny
                     )
                 )
             )
-            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
-//            val inOrder = inOrder(weatherObserver)
-//            inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
-//            inOrder.verify(weatherObserver).onChanged(expectedState)
+            Assert.assertEquals(expectedState.hourlyWeatherData, (weatherViewModel.viewStateData.value as WeatherViewModel.ViewState.Weather).hourlyWeatherData)
         }
     }
 

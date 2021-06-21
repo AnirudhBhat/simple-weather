@@ -2,6 +2,7 @@ package com.abhat.simpleweather.weatherdatasource
 
 import com.abhat.simpleweather.R
 import com.abhat.simpleweather.data.model.*
+import com.abhat.simpleweather.data.repository.WeatherRepoState
 import com.abhat.simpleweather.ui.HourlyWeatherData
 import com.abhat.simpleweather.ui.WeatherViewModel
 
@@ -23,6 +24,20 @@ object WeatherResponseData {
             currentDayWeather,
             dailyWeatherData,
             hourlyWeatherData
+        )
+    }
+
+    fun getSuccessWeatherRepoState(
+        currentDayWeather: WeatherData = getWeatherData(),
+        dailyWeatherData: List<DailyWeatherData> = listOf(getDailyWeatherData()),
+        hourlyWeatherData: List<WeatherData> = listOf(getWeatherData())
+    ): WeatherRepoState<WeatherResponse> {
+        return WeatherRepoState.Success(
+            weatherResponse = getWeatherResponse(
+                currentDayWeather = currentDayWeather,
+                dailyWeatherData = dailyWeatherData,
+                hourlyWeatherData = hourlyWeatherData
+            )
         )
     }
 
@@ -201,6 +216,53 @@ object WeatherResponseData {
     ): WeatherMeta {
         return WeatherMeta(
             id, weatherTitle, description
+        )
+    }
+
+    fun getCloudsWeatherData(description: String): WeatherData {
+        return getWeatherData(
+            weatherMeta = listOf(
+                getWeatherMeta(
+                    description = description
+                )
+            )
+        )
+    }
+
+
+    fun getCloudsDailyWeatherData(description: String): DailyWeatherData {
+        return getDailyWeatherData(
+            weatherMeta = listOf(
+                getWeatherMeta(
+                    description = description
+                )
+            )
+        )
+    }
+
+    fun getCloudsWeatherDataWithTempDetails(
+        min: Float = 0F,
+        max: Float = 0F,
+        temp: Float = 0F,
+        feelsLike: Float = 0F
+    ): WeatherData {
+        return getWeatherData(
+            temp = temp,
+            feelsLike = feelsLike
+        )
+    }
+
+    fun getCloudsDailyWeatherDataWithTempDetails(
+        min: Float = 0F,
+        max: Float = 0F,
+        temp: Float = 0F,
+        feelsLike: Float = 0F
+    ): DailyWeatherData {
+        return getDailyWeatherData(
+            temp = getTemp(
+                min = min,
+                max = max
+            )
         )
     }
 }
