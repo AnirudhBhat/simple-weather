@@ -153,17 +153,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper today weather icon when weather is broken clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            dailyWeatherData = listOf(
-                                WeatherResponseData.getCloudsDailyWeatherData("broken clouds")
-                            )
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(dailyWeatherRepositoryWhen("broken clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -191,17 +181,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper today weather icon when weather is random clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            dailyWeatherData = listOf(
-                                WeatherResponseData.getCloudsDailyWeatherData("random clouds")
-                            )
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(dailyWeatherRepositoryWhen("random clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -229,17 +209,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper today weather icon when weather is thunderstorm`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            dailyWeatherData = listOf(
-                                WeatherResponseData.getCloudsDailyWeatherData("thunderstorm")
-                            )
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(dailyWeatherRepositoryWhen("thunderstorm"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -267,17 +237,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper today weather icon when weather is light rain`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            dailyWeatherData = listOf(
-                                WeatherResponseData.getCloudsDailyWeatherData("light rain")
-                            )
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(dailyWeatherRepositoryWhen("light rain"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -305,17 +265,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper today weather icon when weather is moderate rain`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            dailyWeatherData = listOf(
-                                WeatherResponseData.getCloudsDailyWeatherData("moderate rain")
-                            )
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(dailyWeatherRepositoryWhen("moderate rain"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -337,15 +287,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is sunny`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("clear")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("clear"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -371,15 +313,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is few clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("few clouds")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("few clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -405,15 +339,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather contains word cloud`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("random clouds")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("random clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -439,15 +365,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is broken clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("broken clouds")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("broken clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -467,15 +385,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is scattered clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("scattered clouds")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("scattered clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -504,15 +414,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is overcast clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("overcast clouds")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("overcast clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -538,15 +440,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is light rain`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("light rain")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("light rain"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -572,15 +466,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is moderate rain`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("moderate rain")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("moderate rain"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -606,15 +492,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper icon when weather is thunderstorm`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherData("thunderstorm")
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentWeatherRepositoryWhen("thunderstorm"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -640,20 +518,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper state with min and max for success response`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            dailyWeatherData = listOf(
-                                WeatherResponseData.getCloudsDailyWeatherDataWithTempDetails(
-                                    min = 19F,
-                                    max = 21F
-                                )
-                            )
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(dailyWeatherRepositoryWhenTempIs(min = 19F, max = 21F), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -679,15 +544,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper hourly details with proper icon when weather is thunderstorm`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("thunderstorm"))
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(weatherRepositoryWhen("thunderstorm"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -713,15 +570,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper hourly details with proper icon when weather is broken clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("broken clouds"))
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(weatherRepositoryWhen("broken clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -744,15 +593,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper hourly details with proper icon when weather is scattered clouds`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("scattered clouds"))
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(weatherRepositoryWhen("scattered clouds"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -775,15 +616,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper hourly details with proper icon when weather is moderate rain`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("moderate rain"))
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(weatherRepositoryWhen("moderate rain"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -806,15 +639,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper hourly details with proper icon when weather is light rain`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("light rain"))
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(weatherRepositoryWhen("light rain"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -837,15 +662,7 @@ class WeatherViewModelTest {
     fun `fetching weather details must return proper hourly details with proper icon when weather is sunny`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData("sunny"))
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(weatherRepositoryWhen("sunny"), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -868,15 +685,7 @@ class WeatherViewModelTest {
     fun `fetching weather humidity must return proper humidity for success response`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherDataWithTempDetails(humidity = 65)
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentDayWeatherRepositoryForHumidity(humidity = 65), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -894,15 +703,7 @@ class WeatherViewModelTest {
     fun `fetching weather windspeed must return proper windspeed for success response`() {
         runBlocking {
             // Given
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherResponseData.getSuccessWeatherRepoState(
-                            currentDayWeather = WeatherResponseData.getCloudsWeatherDataWithTempDetails(windSpeed = 9.5F)
-                        )
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(currentDayWeatherRepositoryForWindSpeed(windSpeed = 9.5F), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -921,13 +722,7 @@ class WeatherViewModelTest {
         runBlocking {
             // Given
             val error = RuntimeException()
-            whenever(weatherRepository.getWeatherFor(any(), any()))
-                .thenReturn(
-                    flowOf(
-                        WeatherRepoState.Error(error = error)
-                    )
-                )
-            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            val weatherViewModel = WeatherViewModel(failingWeatherRepository(error), TestContextProvider())
             weatherViewModel.viewStateData.observeForever(weatherObserver)
 
             // When
@@ -943,6 +738,96 @@ class WeatherViewModelTest {
         }
     }
 
+
+
+    private fun failingWeatherRepository(error: Throwable): WeatherRepository {
+        whenever(weatherRepository.getWeatherFor(any(), any()))
+            .thenReturn(
+                flowOf(
+                    WeatherRepoState.Error(error = error)
+                )
+            )
+        return weatherRepository
+    }
+
+    private fun dailyWeatherRepositoryWhenTempIs(min: Float, max: Float): WeatherRepository {
+        whenever(weatherRepository.getWeatherFor(any(), any()))
+            .thenReturn(
+                flowOf(
+                    WeatherResponseData.getSuccessWeatherRepoState(
+                        dailyWeatherData = listOf(
+                            WeatherResponseData.getCloudsDailyWeatherDataWithTempDetails(
+                                min = min,
+                                max = max
+                            )
+                        )
+                    )
+                )
+            )
+        return weatherRepository
+    }
+
+    private fun weatherRepositoryWhen(weather: String): WeatherRepository {
+        whenever(weatherRepository.getWeatherFor(any(), any()))
+            .thenReturn(
+                flowOf(
+                    WeatherResponseData.getSuccessWeatherRepoState(
+                        hourlyWeatherData = listOf(WeatherResponseData.getCloudsWeatherData(weather))
+                    )
+                )
+            )
+        return weatherRepository
+    }
+
+    private fun currentWeatherRepositoryWhen(weather: String): WeatherRepository {
+        whenever(weatherRepository.getWeatherFor(any(), any()))
+            .thenReturn(
+                flowOf(
+                    WeatherResponseData.getSuccessWeatherRepoState(
+                        currentDayWeather = WeatherResponseData.getCloudsWeatherData(weather)
+                    )
+                )
+            )
+        return weatherRepository
+    }
+
+    private fun dailyWeatherRepositoryWhen(weather: String): WeatherRepository {
+        whenever(weatherRepository.getWeatherFor(any(), any()))
+            .thenReturn(
+                flowOf(
+                    WeatherResponseData.getSuccessWeatherRepoState(
+                        dailyWeatherData = listOf(
+                            WeatherResponseData.getCloudsDailyWeatherData(weather)
+                        )
+                    )
+                )
+            )
+        return weatherRepository
+    }
+
+    private fun currentDayWeatherRepositoryForWindSpeed(windSpeed: Float): WeatherRepository {
+        whenever(weatherRepository.getWeatherFor(any(), any()))
+            .thenReturn(
+                flowOf(
+                    WeatherResponseData.getSuccessWeatherRepoState(
+                        currentDayWeather = WeatherResponseData.getCloudsWeatherDataWithTempDetails(windSpeed = windSpeed)
+                    )
+                )
+            )
+        return weatherRepository
+    }
+
+    private fun currentDayWeatherRepositoryForHumidity(humidity: Int): WeatherRepository {
+        whenever(weatherRepository.getWeatherFor(any(), any()))
+            .thenReturn(
+                flowOf(
+                    WeatherResponseData.getSuccessWeatherRepoState(
+                        currentDayWeather = WeatherResponseData.getCloudsWeatherDataWithTempDetails(humidity = humidity)
+                    )
+                )
+            )
+        return weatherRepository
+    }
 
     class TestContextProvider : CoroutineContextProvider() {
         override val Main: CoroutineDispatcher = Dispatchers.Unconfined
