@@ -17,4 +17,15 @@ open class WeatherRepository(private val weatherApi: WeatherApi): Repository<Wea
         }
     }
 
+    override fun getLatLongFor(city: String): Flow<CityRepoState> {
+        return flow {
+            try {
+                val result = weatherApi.getLatLongFor(city).await()
+                emit(CityRepoState.Success(response = result))
+            } catch (e: Exception) {
+                emit(CityRepoState.Error(error = e.cause))
+            }
+        }
+    }
+
 }

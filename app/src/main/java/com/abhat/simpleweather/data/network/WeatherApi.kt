@@ -1,5 +1,6 @@
 package com.abhat.simpleweather.data.network
 
+import com.abhat.simpleweather.data.model.City
 import com.abhat.simpleweather.data.model.WeatherResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
@@ -14,4 +15,10 @@ interface WeatherApi {
         @Query("units") units: String = "metric",
         @Query("appid") appId: String = "API_KEY",
     ): Deferred<WeatherResponse>
+
+    @GET("weather")
+    fun getLatLongFor(
+        @Query("q") query: String,
+        @Query("appid") appId: String = "API_KEY"
+    ): Deferred<City>
 }

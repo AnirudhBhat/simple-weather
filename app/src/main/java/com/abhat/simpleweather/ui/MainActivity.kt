@@ -2,11 +2,14 @@ package com.abhat.simpleweather.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +22,9 @@ import com.abhat.simpleweather.data.network.WeatherApi
 import com.abhat.simpleweather.data.repository.Repository
 import com.abhat.simpleweather.data.repository.WeatherRepository
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -84,6 +90,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         observeViewModel()
+        observeEvent()
+        observeEditText()
         if (savedInstanceState == null) {
             weatherViewModel.getWeatherFor(12.9762F, 77.6033F)
         }
@@ -116,6 +124,35 @@ class MainActivity : AppCompatActivity() {
             val pair = latLongMap["Ooty"]
             weatherViewModel.getWeatherFor(pair?.first!!, pair?.second)
         }
+    }
+
+    private fun observeEvent() {
+        weatherViewModel.event.observe(this, Observer { viewEvent ->
+            when (viewEvent) {
+                is WeatherViewModel.ViewEvent.TriggerWeatherForCity -> {
+                    weatherViewModel.getWeatherFor(viewEvent.lat, viewEvent.lon)
+                }
+            }
+        })
+    }
+
+    private fun observeEditText() {
+        findViewById<EditText>(R.id.et_search).addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                GlobalScope.launch {
+                    delay(800)
+                    weatherViewModel.getLatLongFor(s.toString())
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+        })
     }
 
     private fun observeViewModel() {
@@ -164,7 +201,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 is WeatherViewModel.ViewState.Error -> {
-                    Toast.makeText(this, viewState.throwable?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, viewState.throwable?.message ?: "", Toast.LENGTH_SHORT).show()
                 }
             }
         })

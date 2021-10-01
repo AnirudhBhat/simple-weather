@@ -3,7 +3,8 @@ package com.abhat.simpleweather.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.abhat.simpleweather.R
-import com.abhat.simpleweather.data.model.*
+import com.abhat.simpleweather.data.model.City
+import com.abhat.simpleweather.data.repository.CityRepoState
 import com.abhat.simpleweather.data.repository.WeatherRepoState
 import com.abhat.simpleweather.data.repository.WeatherRepository
 import com.abhat.simpleweather.ui.CoroutineContextProvider
@@ -12,14 +13,12 @@ import com.abhat.simpleweather.weatherdatasource.WeatherResponseData
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.*
 
 class WeatherViewModelTest {
 
@@ -28,11 +27,13 @@ class WeatherViewModelTest {
 
     private lateinit var weatherRepository: WeatherRepository
     private lateinit var weatherObserver: Observer<WeatherViewModel.ViewState>
+    private lateinit var eventObserver: Observer<WeatherViewModel.ViewEvent>
 
     @Before
     fun setUp() {
         weatherRepository = mock()
         weatherObserver = mock()
+        eventObserver = mock()
     }
 
     @Test
@@ -735,6 +736,51 @@ class WeatherViewModelTest {
             val inOrder = inOrder(weatherObserver)
             inOrder.verify(weatherObserver).onChanged(WeatherViewModel.ViewState.Loading(true))
             inOrder.verify(weatherObserver).onChanged(expectedState)
+        }
+    }
+
+    @Test
+    fun `given city name, when getLatLon is called, then TriggerWeatherForCity is called on success`() {
+        val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+        weatherViewModel.viewStateData.observeForever(weatherObserver)
+        weatherViewModel.event.observeForever(eventObserver)
+        whenever(weatherRepository.getLatLongFor("Bengaluru")).thenReturn(
+            flowOf(
+                CityRepoState.Success(
+                    City(
+                    coordination = City.Coordination(
+                        lat = 0f,
+                        lon = 0f
+                    )
+                ))
+            )
+        )
+
+        weatherViewModel.getLatLongFor("Bengaluru")
+
+        Assert.assertEquals(weatherViewModel.event.value, WeatherViewModel.ViewEvent.TriggerWeatherForCity(0f, 0f))
+    }
+
+    @Test
+    fun `given city name, when getLatLon is called, then proper state is called on error`() {
+        runBlocking {
+            // Given
+            val error = CityRepoState.Error(RuntimeException())
+            val weatherViewModel = WeatherViewModel(weatherRepository, TestContextProvider())
+            whenever(weatherRepository.getLatLongFor("Bengaluru")).thenReturn(
+                flowOf(
+                    error
+                )
+            )
+            weatherViewModel.viewStateData.observeForever(weatherObserver)
+
+            // When
+            weatherViewModel.getLatLongFor("Bengaluru")
+
+            // Then
+            val expectedState = WeatherViewModel.ViewState.Error(throwable = error.error)
+
+            Assert.assertEquals(expectedState, weatherViewModel.viewStateData.value)
         }
     }
 

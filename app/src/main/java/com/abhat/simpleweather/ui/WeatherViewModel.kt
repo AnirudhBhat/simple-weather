@@ -9,6 +9,7 @@ import com.abhat.simpleweather.R
 import com.abhat.simpleweather.data.model.DailyWeatherData
 import com.abhat.simpleweather.data.model.WeatherData
 import com.abhat.simpleweather.data.model.WeatherResponse
+import com.abhat.simpleweather.data.repository.CityRepoState
 import com.abhat.simpleweather.data.repository.Repository
 import com.abhat.simpleweather.data.repository.WeatherRepoState
 import kotlinx.coroutines.flow.collect
@@ -22,6 +23,13 @@ class WeatherViewModel(
 
     private val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val viewStateData: LiveData<ViewState> = viewState
+
+    private val _event: MutableLiveData<ViewEvent> = MutableLiveData()
+    val event: LiveData<ViewEvent> = _event
+
+    sealed class ViewEvent {
+        data class TriggerWeatherForCity(val lat: Float, val lon: Float): ViewEvent()
+    }
 
     sealed class ViewState(open var isLoading: Boolean = false) {
         data class Loading(override var isLoading: Boolean = true) : ViewState()
@@ -74,6 +82,29 @@ class WeatherViewModel(
                     is WeatherRepoState.Error -> {
                         withContext(coroutineContextProvider.Main) {
                             viewState.value = ViewState.Error(weatherRepoState.error)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun getLatLongFor(city: String) {
+        viewModelScope.launch(coroutineContextProvider.IO) {
+            weatherRepository.getLatLongFor(city).collect { cityRepoState ->
+                when(cityRepoState) {
+                    is CityRepoState.Success -> {
+                        cityRepoState.response.coordination?.let { coord ->
+                            withContext(coroutineContextProvider.Main) {
+                                _event.value = ViewEvent.TriggerWeatherForCity(
+                                    coord.lat,
+                                    coord.lon)
+                            }
+                        }
+                    }
+                    is CityRepoState.Error -> {
+                        withContext(coroutineContextProvider.Main) {
+                            viewState.value = ViewState.Error(cityRepoState.error)
                         }
                     }
                 }

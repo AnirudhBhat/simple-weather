@@ -12,6 +12,14 @@
         android:layout_marginBottom="16dp"
         tools:context=".ui.MainActivity">
 
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:hint="Search cities"/>
+
         <TextView
             android:id="@+id/tv_right_now"
             android:layout_width="wrap_content"
@@ -23,7 +31,7 @@
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/et_search" />
 
         <TextView
             android:id="@+id/tv_temp"
@@ -481,7 +489,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="Bengaluru"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_hourly_weather"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
@@ -491,7 +499,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginBottom="24dp"
             android:text="Shivamogga"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_hourly_weather"
             app:layout_constraintStart_toEndOf="@id/btn_bengaluru" />
 
         <Button
@@ -501,7 +509,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginBottom="24dp"
             android:text="Udupi"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_hourly_weather"
             app:layout_constraintStart_toEndOf="@id/btn_shivamogga" />
 
         <Button
@@ -511,7 +519,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginBottom="24dp"
             android:text="Madikeri"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_hourly_weather"
             app:layout_constraintStart_toEndOf="@id/btn_udupi" />
 
         <Button
@@ -521,7 +529,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginBottom="8dp"
             android:text="Chikmagaluru"
-            app:layout_constraintBottom_toTopOf="@id/btn_bengaluru"
+            app:layout_constraintTop_toBottomOf="@id/btn_bengaluru"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
@@ -531,7 +539,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginBottom="8dp"
             android:text="Ooty"
-            app:layout_constraintBottom_toTopOf="@id/btn_bengaluru"
+            app:layout_constraintTop_toBottomOf="@id/btn_bengaluru"
             app:layout_constraintStart_toEndOf="@id/btn_chikmagaluru" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
